@@ -2,9 +2,11 @@
 import Botao from "../botao/Botao"
 import ComponenteQuestao from "../questao/ComponenteQuestao"
 import Questao from "@/core/interfaces/Questao"
-import { embaralhar } from "@/functions/embaralharArray"
+// import { embaralhar } from "@/functions/embaralharArray"
 import Resposta from "@/core/interfaces/Resposta"
-import { useEffect, useState, useRef } from "react";
+// import { useRef } from "react";
+import { useEffect, useState } from "react";
+import { listaDeQuestoes } from "@/app/api/bancoDeQuestoes"
 
 interface QuestionarioProps {
 	categoria: string
@@ -14,42 +16,47 @@ export default function Questionario({ categoria }: QuestionarioProps) {
 
 
 	const [indexQuestaoAtual, setIndexQuestaoAtual] = useState(0)
-	const BASE_URL = 'http://localhost:3000/api'
+	// const BASE_URL = 'http://localhost:3000/api'
 	const [arrayDeQuestoes, setArrayDeQuestoes] = useState<Questao[]>([])
 	const [loading, setLoading] = useState(true)
 	const [acertos, setAcertos] = useState(0)
-	const carregado = useRef(false);
+	// const carregado = useRef(false);
 
-	async function carregarQuestao(id: number) {
-		const resp = await fetch(`${BASE_URL}/users/questoes/${id}`)
-		const questaoJson = await resp.json()
-		return questaoJson
-	}
+	// async function carregarQuestao(id: number) {
+	// 	const resp = await fetch(`${BASE_URL}/users/questoes/${id}`)
+	// 	const questaoJson = await resp.json()
+	// 	return questaoJson
+	// }
+
+	// useEffect(() => {
+	// 	if (carregado.current) return
+
+	// 	const carregarTudo = async () => {
+	// 		const respIds = await fetch(`${BASE_URL}/users/questionarios/${categoria}`)
+	// 		const ids = await respIds.json()
+
+	// 		const questoes = await Promise.all(
+	// 			ids.map((id: number) => carregarQuestao(id))
+	// 		);
+
+	// 		const questoesComRespostasEmbaralhadas = questoes.map(questao => ({
+	// 			...questao,
+	// 			respostas: embaralhar(questao.respostas),
+	// 		}))
+
+	// 		setArrayDeQuestoes(questoesComRespostasEmbaralhadas.slice(0, 10))
+	// 		setLoading(false)
+	// 	};
+
+	// 	carregarTudo()
+	// 	carregado.current = true
+	// }, [])
 
 	useEffect(() => {
-		if (carregado.current) return
-
-		const carregarTudo = async () => {
-			const respIds = await fetch(`${BASE_URL}/users/questionarios/${categoria}`)
-			const ids = await respIds.json()
-
-			const questoes = await Promise.all(
-				ids.map((id: number) => carregarQuestao(id))
-			);
-
-			const questoesComRespostasEmbaralhadas = questoes.map(questao => ({
-				...questao,
-				respostas: embaralhar(questao.respostas),
-			}))
-
-			setArrayDeQuestoes(questoesComRespostasEmbaralhadas.slice(0, 10))
-			setLoading(false)
-		};
-
-		carregarTudo()
-		carregado.current = true
+		const questoes = listaDeQuestoes.filter(questao => questao.categoria == categoria)
+		setArrayDeQuestoes(questoes)
+		setLoading(false)
 	}, [])
-
 
 	function proximaQuestao() {
 		// possibilidade de usar settimeout aqui
