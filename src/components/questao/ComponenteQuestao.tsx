@@ -80,14 +80,14 @@ export default function ComponenteQuestao({ valor, tempoPraResposta, verificarRe
                                 onClick={() => virarResposta(resposta)}
                             >
                                 {/* Frente */}
-                                <div className={`${respostaUsuario ? "hidden" : "flex"} items-center gap-1 absolute top-0 left-0 h-full w-full p-1`}>
+                                <div className={`${respostaUsuario ? "hidden" : "grid"} items-center gap-2 absolute px-2 top-0 left-0 h-full w-full p-1`} style={{gridTemplateColumns: '40px 1fr'}}>
                                     <span
                                         className="bg-orange-400 text-white w-10 h-10 flex justify-center items-center text-xl rounded-full font-black"
                                         style={{ textShadow: "1px 1px 2px black" }}
                                     >
                                         {definirLetraAlternativa(i)}
                                     </span>
-                                    <p className="font-bold text-lg">{resposta.valor}</p>
+                                    <p className="font-bold text-lg text-start leading-6">{resposta.valor}</p>
                                 </div>
 
                                 {/* Verso */}

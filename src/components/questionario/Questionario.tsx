@@ -7,6 +7,7 @@ import Resposta from "@/core/interfaces/Resposta"
 // import { useRef } from "react";
 import { useEffect, useState } from "react";
 import { listaDeQuestoes } from "@/app/api/bancoDeQuestoes"
+import { embaralhar } from "@/functions/embaralharArray"
 
 interface QuestionarioProps {
 	categoria: string
@@ -53,8 +54,14 @@ export default function Questionario({ categoria }: QuestionarioProps) {
 	// }, [])
 
 	useEffect(() => {
-		const questoes = listaDeQuestoes.filter(questao => questao.categoria == categoria)
-		setArrayDeQuestoes(questoes)
+		const questoes = embaralhar(listaDeQuestoes.filter(questao => questao.categoria == categoria))
+		const questoesComRespostasEmbaralhadas = questoes.map(questao => {
+			return {
+				...questao,
+				respostas: embaralhar(questao.respostas)
+			}
+		})
+		setArrayDeQuestoes(questoesComRespostasEmbaralhadas)
 		setLoading(false)
 	}, [])
 
@@ -72,7 +79,7 @@ export default function Questionario({ categoria }: QuestionarioProps) {
 	}
 
 	return (
-		<div className="flex flex-col justify-center items-center">
+		<div className="flex flex-col justify-center items-center min-h-[100vh]">
 			{loading ? (
 				<div className="h-[100vh] w-full flex justify-center items-center">
 					<p className="text-2xl font-bold ">Carregando questões...</p>
