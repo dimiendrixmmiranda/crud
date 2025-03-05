@@ -5,7 +5,7 @@ import Questao from "@/core/interfaces/Questao"
 // import { embaralhar } from "@/functions/embaralharArray"
 import Resposta from "@/core/interfaces/Resposta"
 // import { useRef } from "react";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { listaDeQuestoes } from "@/app/api/bancoDeQuestoes"
 import { embaralhar } from "@/functions/embaralharArray"
 
@@ -14,6 +14,7 @@ interface QuestionarioProps {
 }
 
 export default function Questionario({ categoria }: QuestionarioProps) {
+	const audioMusicaPergunta = useRef<HTMLAudioElement | null>(null);
 
 
 	const [indexQuestaoAtual, setIndexQuestaoAtual] = useState(0)
@@ -65,6 +66,26 @@ export default function Questionario({ categoria }: QuestionarioProps) {
 		setLoading(false)
 	}, [])
 
+	useEffect(() => {
+		// Criar a instância do áudio se não existir
+		if (!audioMusicaPergunta.current) {
+			audioMusicaPergunta.current = new Audio("/audio/contagem-regressiva.mp3");
+			audioMusicaPergunta.current.loop = true; // Loop enquanto a pergunta estiver ativa
+		}
+
+		// Tocar o áudio quando a questão mudar, se não estiver tocando
+		if (audioMusicaPergunta.current.paused) {
+			audioMusicaPergunta.current.play().catch(err => console.error("Erro ao tocar o áudio:", err));
+		}
+
+		// Parar o áudio quando o componente desmontar ou a pergunta mudar
+		return () => {
+			audioMusicaPergunta.current?.pause();
+			audioMusicaPergunta.current!.currentTime = 0; // Reiniciar o áudio para a próxima pergunta
+		};
+	}, [indexQuestaoAtual]);
+
+
 	function proximaQuestao() {
 		// possibilidade de usar settimeout aqui
 		if (indexQuestaoAtual < arrayDeQuestoes.length - 1) {
@@ -73,10 +94,14 @@ export default function Questionario({ categoria }: QuestionarioProps) {
 	}
 
 	const verificarResposta = (resposta: Resposta) => {
+		// Parar a música ao responder
+		audioMusicaPergunta.current?.pause();
+		audioMusicaPergunta.current!.currentTime = 0;
+
 		if (resposta.certa) {
-			setAcertos(prev => prev + 1)
+			setAcertos(prev => prev + 1);
 		}
-	}
+	};
 
 	return (
 		<div className="flex flex-col justify-center items-center min-h-[100vh]">
