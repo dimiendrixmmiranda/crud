@@ -2,12 +2,11 @@ interface InputProps {
     texto: string
     valor: string | number
     somenteLeitura?: boolean
-    tipo?: 'text' | 'number'
     className?: string
-    onchange?: (valor: any) => void
+    onchange?: (evento: string) => void
 }
 
-export default function Input({ texto, valor, tipo, somenteLeitura, className,onchange }: InputProps) {
+export default function Input({ texto, valor, somenteLeitura, className,onchange }: InputProps) {
     return (
         <div className={`flex flex-col gap-2 ${className}`}>
             <label>
@@ -15,7 +14,7 @@ export default function Input({ texto, valor, tipo, somenteLeitura, className,on
             </label>
             <input
                 className="border border-purple-500 rounded-lg focus:outline-none bg-gray-100 px-2 py-1 focus:bg-white"
-                type={`${tipo ?? 'text'}`}
+                type="text"
                 value={valor}
                 readOnly={somenteLeitura}
                 onChange={(e) => {

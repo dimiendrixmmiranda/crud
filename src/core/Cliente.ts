@@ -1,5 +1,5 @@
 export default interface Cliente{
     nome: string
-    idade: number
+    idade: string
     id: string | null
 }

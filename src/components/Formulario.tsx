@@ -12,7 +12,7 @@ interface FormularioProps {
 export default function Formulario({ cliente, cancelado, clienteAlterado }: FormularioProps) {
     const id = cliente?.id ?? null
     const [nome, setNome] = useState(cliente?.nome ?? '')
-    const [idade, setIdade] = useState(cliente?.idade ?? 0)
+    const [idade, setIdade] = useState(cliente?.idade ?? '0')
 
     return (
         <div>
@@ -28,16 +28,14 @@ export default function Formulario({ cliente, cancelado, clienteAlterado }: Form
             }
             <Input
                 texto="Nome"
-                tipo="text"
                 valor={nome}
-                onchange={setNome}
+                onchange={(valor: string) => setNome(valor)}  // Especificando o tipo correto para setNome
                 className="mb-4"
             />
             <Input
                 texto="Idade"
-                tipo="number"
                 valor={idade}
-                onchange={setIdade}
+                onchange={(valor: string) => setIdade(valor)}  // Especificando o tipo correto para setIdade
                 className="mb-4"
             />
 
