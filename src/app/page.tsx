@@ -1,67 +1,64 @@
-'use client'
-import { useEffect, useRef, useState } from "react";
-import Template from "@/components/template/Template";
-import { listaDeCategorias } from "@/core/constants/listaDeCategorias";
-import Image from "next/image";
-import Link from "next/link";
-import { FaPlay } from "react-icons/fa";
+// src/pages/index.tsx
+"use client";
+import { excluirCliente, obterClientes, salvarCliente } from "@/backend/ClienteServico";
+import Botao from "@/components/Botao";
+import Formulario from "@/components/Formulario";
+import Layout from "@/components/Layout";
+import Tabela from "@/components/Tabela";
+import Cliente from "@/core/Cliente";
+import { useEffect, useState } from "react";
 
 export default function Home() {
-	const [categoriaSelecionada, setCategoriaSelecionada] = useState<string | null>(null);
-	const [desabilitado, setDesabilitado] = useState(true);
-	const audioBotaoRef = useRef<HTMLAudioElement | null>(null);
-	const audioPlayRef = useRef<HTMLAudioElement | null>(null);
+	const [clientes, setClientes] = useState<Cliente[]>([]);
+	const [cliente, setCliente] = useState<Cliente | null>(null);
+	const [visible, setVisible] = useState<"tabela" | "formulario">("tabela");
 
 	useEffect(() => {
-		audioBotaoRef.current = new Audio("/audio/som-botao.mp3");
-		audioPlayRef.current = new Audio("/audio/play.mp3");
+		async function carregarClientes() {
+			const lista = await obterClientes();
+			setClientes(lista);
+		}
+		carregarClientes();
 	}, []);
 
-	return (
-		<Template>
-			<div className="min-h-[80vh] flex flex-col justify-center items-center gap-6">
-				<Image alt="Logo" src="/quiz.png" width={300} height={200} />
-				<div className="flex flex-col gap-3 justify-items-center items-center">
-					<h2 className="text-xl font-black md:text-2xl" style={{ textShadow: "1px 1px 2px black" }}>
-						Selecione uma categoria:
-					</h2>
-					<ul className="flex flex-col gap-2 md:grid md:grid-cols-2 md:gap-x-4">
-						{listaDeCategorias.map((categoria) => (
-							<li key={categoria.id}>
-								<button
-									className={`px-2 w-full text-lg font-bold py-1 rounded-lg transition-all ${categoriaSelecionada === categoria.id ? "scale-[1.05]" : ""
-										}`}
-									style={{
-										textShadow: "1px 1px 2px black",
-										boxShadow: "0 0 1px 2px black",
-										backgroundColor: `${categoriaSelecionada === categoria.id ? "var(--azul)" : "var(--preto)"}`,
-									}}
-									onClick={() => {
-										setCategoriaSelecionada(categoria.id);
-										setDesabilitado(false);
-										audioBotaoRef.current?.play().catch((error) => console.error("Erro ao reproduzir o áudio:", error));
-									}}
-								>
-									{categoria.nome}
-								</button>
-							</li>
-						))}
-					</ul>
-				</div>
+	async function clienteSelecionado(cliente: Cliente) {
+		setCliente(cliente);
+		setVisible("formulario");
+	}
 
-				<button className="bg-[--preto] py-2 rounded-lg w-full max-w-[200px]" style={{ boxShadow: "0 0 3px 2px black" }} disabled={desabilitado}>
-					<Link
-						href={desabilitado ? "" : `/questionario?categoria=${categoriaSelecionada}`}
-						className="fonteEspecial text-3xl flex justify-center items-center gap-3"
-						style={{ textShadow: "1px 1px 2px black" }}
-						onClick={() => {
-							audioPlayRef.current?.play().catch((error) => console.error("Erro ao reproduzir o áudio:", error));
-						}}
-					>
-						Start <FaPlay className="text-2xl" />
-					</Link>
-				</button>
-			</div>
-		</Template>
+	async function clienteExcluido(cliente: Cliente) {
+		if (!cliente.id) return;
+		await excluirCliente(cliente.id);
+		setClientes(await obterClientes());
+	}
+
+	async function salvar(cliente: Cliente) {
+		await salvarCliente(cliente);
+		setClientes(await obterClientes());
+		setVisible("tabela");
+	}
+
+	function novoCliente() {
+		setCliente(null);
+		setVisible("formulario");
+	}
+
+	return (
+		<div className="flex justify-center items-center min-h-screen min-w-screen bg-gradient-to-r from-blue-500 to-purple-500">
+			<Layout titulo="Cadastro Simples">
+				{visible === "tabela" ? (
+					<>
+						<div className="flex justify-end">
+							<Botao cor="green" onclick={novoCliente}>
+								Novo Cliente
+							</Botao>
+						</div>
+						<Tabela listaDeClientes={clientes} clienteSelecionado={clienteSelecionado} clienteExcluido={clienteExcluido} />
+					</>
+				) : (
+					<Formulario cliente={cliente} clienteAlterado={salvar} cancelado={() => setVisible("tabela")} />
+				)}
+			</Layout>
+		</div>
 	);
 }
