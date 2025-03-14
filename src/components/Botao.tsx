@@ -14,6 +14,7 @@ export default function Botao({ children, className, cor, onclick }: BotaoProps)
         <button onClick={onclick} className={`
             text-white
             px-4 py-2 rounded-lg mb-4
+            whitespace-nowrap
             ${definirCor}
             ${className}
         `}>

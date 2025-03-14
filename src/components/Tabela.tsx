@@ -8,7 +8,6 @@ interface TabelaProps {
 }
 
 export default function Tabela({ listaDeClientes, clienteSelecionado, clienteExcluido }: TabelaProps) {
-
     const exibirAcoes = clienteSelecionado || clienteExcluido
 
     function renderizarCabecalho() {
@@ -61,8 +60,7 @@ export default function Tabela({ listaDeClientes, clienteSelecionado, clienteExc
             })
         )
     }
-
-    return (
+    return listaDeClientes.length > 0 ? (
         <table className="w-full rounded-xl overflow-hidden">
             <thead className="
                 text-gray-200
@@ -74,5 +72,7 @@ export default function Tabela({ listaDeClientes, clienteSelecionado, clienteExc
                 {renderizarDados()}
             </tbody>
         </table>
+    ) : (
+        <p className="text-center uppercase font-bold text-2xl w-full">Nenhum cliente cadastrado</p>
     )
 }
